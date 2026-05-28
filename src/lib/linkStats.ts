@@ -5,7 +5,36 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const isSupabaseConfigured = supabaseUrl !== "" && supabaseKey !== "";
 
 const supabase = isSupabaseConfigured ? createClient(supabaseUrl, supabaseKey) : null;
-const STORAGE_KEY = "web3ai_link_stats"; // changed key for local storage to avoid conflict
+const STORAGE_KEY = "web3ai_link_stats";
+
+// クリック数のクールダウン管理（3時間）
+// UIには影響せず、バックエンドへの書き込みのみ制限する
+const CLICK_COOLDOWN_KEY = "web3ai_click_cooldown";
+const CLICK_COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3時間
+
+function getClickCooldowns(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const data = localStorage.getItem(CLICK_COOLDOWN_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * クリックをバックエンドに書き込んでよいか判定し、OKなら記録する
+ */
+function checkAndSetClickCooldown(linkId: string): boolean {
+  const cooldowns = getClickCooldowns();
+  const last = cooldowns[linkId];
+  if (last && Date.now() - last < CLICK_COOLDOWN_MS) {
+    return false; // クールダウン中 → 書き込みしない
+  }
+  cooldowns[linkId] = Date.now();
+  localStorage.setItem(CLICK_COOLDOWN_KEY, JSON.stringify(cooldowns));
+  return true; // クールダウン解除 → 書き込みOK
+}
 
 export type LinkStatData = {
   clicks: number;
@@ -90,12 +119,20 @@ export const getLinkDetails = async (): Promise<LinkDetails> => {
 
 /**
  * 特定のリンクの統計を加算して保存します。
+ * clickの場合はクールダウン（3時間）を確認し、期間内なら書き込みをスキップします。
+ * UIへの影響はなく、バックエンドへの書き込みのみ制限されます。
  */
 export const incrementStat = async (linkId: string, type: "click" | "recommend"): Promise<LinkStatData> => {
+  // clickの場合はクールダウンチェック（UIには反映しない、書き込みだけ制限）
+  if (type === "click" && !checkAndSetClickCooldown(linkId)) {
+    // クールダウン中 → 現在のサーバーの値をそのまま返す（UIは呼び出し元で楽観的更新済み）
+    return { clicks: 0, recommends: 0 };
+  }
+
   if (isSupabaseConfigured && supabase) {
     try {
       // 1. まず現在の値を取得
-      const { data: currentData, error: selectError } = await supabase
+      const { data: currentData } = await supabase
         .from("link_clicks")
         .select("click_count, recommend_count")
         .eq("link_id", linkId)
@@ -124,7 +161,7 @@ export const incrementStat = async (linkId: string, type: "click" | "recommend")
     }
   }
 
-  // フォールバック
+  // フォールバック (localStorage)
   if (typeof window !== "undefined") {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
