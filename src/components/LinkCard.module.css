@@ -23,8 +23,8 @@
 }
 
 .card.popular {
-  border: 1px solid #ffedd5;
-  background-color: #fffaf0;
+  border: 1px solid #fef08a;
+  background-color: #fefce8;
 }
 
 .header {
@@ -69,8 +69,8 @@
 }
 
 .badgePopular {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background-color: #fef08a;
+  color: #854d0e;
 }
 
 .badgeDuplicate {
@@ -115,6 +115,44 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.recommendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recommendButton:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.recommendButton:active {
+  transform: scale(0.95);
+}
+
+.recommendCount {
+  margin-left: 4px;
+  background-color: #cbd5e1;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.75rem;
 }
 
 .button {

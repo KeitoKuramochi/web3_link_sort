@@ -2,27 +2,35 @@
 
 import { LinkItem } from "../data/lessons";
 import styles from "./LinkCard.module.css";
-import { incrementLinkClick } from "../lib/linkStats";
+import { incrementStat, LinkStatData } from "../lib/linkStats";
 
 interface LinkCardProps {
   link: LinkItem;
-  clickCount: number;
+  stats: LinkStatData;
   isPopular?: boolean;
-  onLinkClick?: (id: string, newCount: number) => void;
+  onStatChange?: (id: string, newStats: LinkStatData) => void;
 }
 
-export default function LinkCard({ link, clickCount, isPopular, onLinkClick }: LinkCardProps) {
-  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // リンクを開く前にクリック数を加算 (楽観的UI更新として先にカウントを上げることも可能ですが、今回はシンプルに処理)
-    if (onLinkClick) {
-      // 画面上の数値を即座に増やす（楽観的更新）
-      onLinkClick(link.id, clickCount + 1);
+export default function LinkCard({ link, stats, isPopular, onStatChange }: LinkCardProps) {
+  const handleLinkClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // クリック数増加
+    if (onStatChange) {
+      onStatChange(link.id, { ...stats, clicks: stats.clicks + 1 });
     }
-    // バックグラウンドで非同期に保存
-    const newCount = await incrementLinkClick(link.id);
-    if (onLinkClick && newCount > clickCount + 1) {
-      // もし他人のクリック等で更に増えていたら再更新
-      onLinkClick(link.id, newCount);
+    const newStats = await incrementStat(link.id, "click");
+    if (onStatChange) {
+      onStatChange(link.id, newStats);
+    }
+  };
+
+  const handleRecommendClick = async () => {
+    // おすすめ数増加
+    if (onStatChange) {
+      onStatChange(link.id, { ...stats, recommends: stats.recommends + 1 });
+    }
+    const newStats = await incrementStat(link.id, "recommend");
+    if (onStatChange) {
+      onStatChange(link.id, newStats);
     }
   };
 
@@ -36,7 +44,7 @@ export default function LinkCard({ link, clickCount, isPopular, onLinkClick }: L
       <div className={styles.badges}>
         {isPopular && (
           <span className={`${styles.badge} ${styles.badgePopular}`}>
-            🔥 人気
+            🌟 超おすすめ
           </span>
         )}
         <span className={`${styles.badge} ${styles.badgeCategory}`}>
@@ -56,17 +64,27 @@ export default function LinkCard({ link, clickCount, isPopular, onLinkClick }: L
 
       <div className={styles.footer}>
         <div className={styles.stats}>
-          <span>👀 {clickCount} views</span>
+          <span>👀 {stats.clicks} views</span>
         </div>
-        <a 
-          href={link.url} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className={styles.button}
-          onClick={handleClick}
-        >
-          リンクを開く <span className={styles.buttonIcon}>↗</span>
-        </a>
+        
+        <div className={styles.actions}>
+          <button 
+            onClick={handleRecommendClick}
+            className={styles.recommendButton}
+          >
+            👍 おすすめ <span className={styles.recommendCount}>{stats.recommends}</span>
+          </button>
+          
+          <a 
+            href={link.url} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className={styles.button}
+            onClick={handleLinkClick}
+          >
+            リンクを開く <span className={styles.buttonIcon}>↗</span>
+          </a>
+        </div>
       </div>
     </div>
   );
