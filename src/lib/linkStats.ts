@@ -16,6 +16,15 @@ export type LinkStats = {
   [linkId: string]: LinkStatData;
 };
 
+export type LinkDetailData = {
+  title: string;
+  summary: string;
+};
+
+export type LinkDetails = {
+  [linkId: string]: LinkDetailData;
+};
+
 /**
  * 全てのリンクの統計を取得します。
  */
@@ -47,6 +56,33 @@ export const getLinkStats = async (): Promise<LinkStats> => {
       return data ? JSON.parse(data) : {};
     } catch (error) {
       console.error("Failed to parse from localStorage", error);
+    }
+  }
+  return {};
+};
+
+/**
+ * 全てのリンクのタイトル・説明の変更（オーバーライド）を取得します。
+ */
+export const getLinkDetails = async (): Promise<LinkDetails> => {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("link_details")
+        .select("link_id, title, summary");
+
+      if (error) throw error;
+      
+      const details: LinkDetails = {};
+      data?.forEach((row: any) => {
+        details[row.link_id] = {
+          title: row.title,
+          summary: row.summary
+        };
+      });
+      return details;
+    } catch (error) {
+      console.error("Supabaseからの詳細取得に失敗しました", error);
     }
   }
   return {};
@@ -110,4 +146,28 @@ export const incrementStat = async (linkId: string, type: "click" | "recommend")
   }
   
   return { clicks: 0, recommends: 0 };
+};
+
+/**
+ * リンクのタイトルと説明を更新します。
+ */
+export const updateLinkDetail = async (linkId: string, title: string, summary: string): Promise<boolean> => {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { error } = await supabase
+        .from("link_details")
+        .upsert({ 
+          link_id: linkId, 
+          title,
+          summary
+        }, { onConflict: "link_id" });
+        
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Supabaseへの詳細保存に失敗しました", error);
+      return false;
+    }
+  }
+  return false;
 };

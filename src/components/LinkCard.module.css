@@ -32,6 +32,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
+  width: 100%;
 }
 
 .title {
@@ -40,6 +41,18 @@
   color: #1a202c;
   margin: 0;
   line-height: 1.4;
+  word-break: break-word;
+}
+
+.editInput {
+  flex-grow: 1;
+  font-size: 1.125rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
 }
 
 .badges {
@@ -82,6 +95,7 @@
   font-size: 0.875rem;
   color: #6b7280;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .summary {
@@ -91,6 +105,18 @@
   flex-grow: 1;
 }
 
+.editTextarea {
+  width: 100%;
+  font-size: 0.9375rem;
+  padding: 8px 12px;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.5;
+}
+
 .context {
   font-size: 0.875rem;
   color: #718096;
@@ -98,6 +124,48 @@
   padding: 10px;
   border-radius: 8px;
   border-left: 3px solid #cbd5e1;
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.saveButton {
+  padding: 6px 16px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #059669;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: 6px 12px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #e2e8f0;
 }
 
 .footer {
@@ -114,7 +182,26 @@
   color: #64748b;
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.editIconButton {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
   gap: 4px;
+}
+
+.editIconButton:hover {
+  background-color: #f1f5f9;
+  color: #3b82f6;
 }
 
 .actions {

@@ -1,19 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import { LinkItem } from "../data/lessons";
 import styles from "./LinkCard.module.css";
-import { incrementStat, LinkStatData } from "../lib/linkStats";
+import { incrementStat, LinkStatData, updateLinkDetail, LinkDetailData } from "../lib/linkStats";
 
 interface LinkCardProps {
   link: LinkItem;
   stats: LinkStatData;
+  detailOverride?: LinkDetailData;
   isPopular?: boolean;
   onStatChange?: (id: string, newStats: LinkStatData) => void;
+  onDetailChange?: (id: string, newDetail: LinkDetailData) => void;
 }
 
-export default function LinkCard({ link, stats, isPopular, onStatChange }: LinkCardProps) {
+export default function LinkCard({ link, stats, detailOverride, isPopular, onStatChange, onDetailChange }: LinkCardProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(detailOverride?.title || link.title);
+  const [editSummary, setEditSummary] = useState(detailOverride?.summary || link.summary);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const displayTitle = detailOverride?.title || link.title;
+  const displaySummary = detailOverride?.summary || link.summary;
+
   const handleLinkClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // クリック数増加
     if (onStatChange) {
       onStatChange(link.id, { ...stats, clicks: stats.clicks + 1 });
     }
@@ -24,7 +34,6 @@ export default function LinkCard({ link, stats, isPopular, onStatChange }: LinkC
   };
 
   const handleRecommendClick = async () => {
-    // おすすめ数増加
     if (onStatChange) {
       onStatChange(link.id, { ...stats, recommends: stats.recommends + 1 });
     }
@@ -34,10 +43,29 @@ export default function LinkCard({ link, stats, isPopular, onStatChange }: LinkC
     }
   };
 
+  const handleSaveEdit = async () => {
+    setIsSaving(true);
+    const success = await updateLinkDetail(link.id, editTitle, editSummary);
+    if (success && onDetailChange) {
+      onDetailChange(link.id, { title: editTitle, summary: editSummary });
+    }
+    setIsSaving(false);
+    setIsEditing(false);
+  };
+
   return (
     <div className={`${styles.card} ${link.isCore ? styles.core : ""} ${isPopular ? styles.popular : ""}`}>
       <div className={styles.header}>
-        <h3 className={styles.title}>{link.title}</h3>
+        {isEditing ? (
+          <input 
+            className={styles.editInput} 
+            value={editTitle} 
+            onChange={(e) => setEditTitle(e.target.value)} 
+            placeholder="タイトルを入力"
+          />
+        ) : (
+          <h3 className={styles.title}>{displayTitle}</h3>
+        )}
         <div className={styles.sharer}>{link.sharer}</div>
       </div>
       
@@ -57,14 +85,39 @@ export default function LinkCard({ link, stats, isPopular, onStatChange }: LinkC
         )}
       </div>
 
-      <p className={styles.summary}>{link.summary}</p>
+      {isEditing ? (
+        <textarea 
+          className={styles.editTextarea} 
+          value={editSummary} 
+          onChange={(e) => setEditSummary(e.target.value)} 
+          placeholder="説明文を入力"
+          rows={3}
+        />
+      ) : (
+        <p className={styles.summary}>{displaySummary}</p>
+      )}
+      
       <div className={styles.context}>
         <strong>授業内での意味：</strong> {link.lessonContext}
       </div>
 
+      {isEditing && (
+        <div className={styles.editActions}>
+          <button onClick={() => setIsEditing(false)} className={styles.cancelButton} disabled={isSaving}>キャンセル</button>
+          <button onClick={handleSaveEdit} className={styles.saveButton} disabled={isSaving}>
+            {isSaving ? "保存中..." : "保存する"}
+          </button>
+        </div>
+      )}
+
       <div className={styles.footer}>
         <div className={styles.stats}>
           <span>👀 {stats.clicks} views</span>
+          {!isEditing && (
+            <button onClick={() => setIsEditing(true)} className={styles.editIconButton} title="タイトルや説明を編集">
+              ✏️ 編集
+            </button>
+          )}
         </div>
         
         <div className={styles.actions}>

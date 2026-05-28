@@ -4,13 +4,14 @@ import { useState, useEffect, useMemo } from "react";
 import { lessons } from "../data/lessons";
 import LinkCard from "../components/LinkCard";
 import styles from "./page.module.css";
-import { getLinkStats, LinkStats, LinkStatData } from "../lib/linkStats";
+import { getLinkStats, LinkStats, LinkStatData, getLinkDetails, LinkDetails, LinkDetailData } from "../lib/linkStats";
 
 export default function Home() {
   // 選択中の授業回 (デフォルトは第6回)
   const [selectedLessonId, setSelectedLessonId] = useState<string>("6");
   
   const [stats, setStats] = useState<LinkStats>({});
+  const [details, setDetails] = useState<LinkDetails>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [coreOnly, setCoreOnly] = useState(false);
@@ -18,11 +19,15 @@ export default function Home() {
   
   // マウント時・授業回変更時に統計データを取得
   useEffect(() => {
-    const fetchStats = async () => {
-      const data = await getLinkStats();
-      setStats(data);
+    const fetchData = async () => {
+      const [statsData, detailsData] = await Promise.all([
+        getLinkStats(),
+        getLinkDetails()
+      ]);
+      setStats(statsData);
+      setDetails(detailsData);
     };
-    fetchStats();
+    fetchData();
   }, []);
 
   const lesson = lessons.find((l) => l.lessonId === selectedLessonId);
@@ -114,6 +119,13 @@ export default function Home() {
     }));
   };
 
+  const handleDetailChange = (id: string, newDetail: LinkDetailData) => {
+    setDetails(prev => ({
+      ...prev,
+      [id]: newDetail
+    }));
+  };
+
   return (
     <main className={styles.main}>
       <header className={styles.header}>
@@ -157,8 +169,10 @@ export default function Home() {
                   key={`popular-${link.id}`} 
                   link={link} 
                   stats={stats[link.id] || { clicks: 0, recommends: 0 }}
+                  detailOverride={details[link.id]}
                   isPopular={true}
                   onStatChange={handleStatChange}
+                  onDetailChange={handleDetailChange}
                 />
               ))}
             </div>
@@ -225,8 +239,10 @@ export default function Home() {
                     key={link.id} 
                     link={link} 
                     stats={stats[link.id] || { clicks: 0, recommends: 0 }}
+                    detailOverride={details[link.id]}
                     isPopular={topPopularLinks.some(pop => pop.id === link.id)}
                     onStatChange={handleStatChange}
+                    onDetailChange={handleDetailChange}
                   />
                 ))}
               </div>
