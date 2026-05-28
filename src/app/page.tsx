@@ -13,6 +13,7 @@ export default function Home() {
   const [details, setDetails] = useState<LinkDetails>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sharerFilter, setSharerFilter] = useState("all");
   const [coreOnly, setCoreOnly] = useState(false);
   const [sortBy, setSortBy] = useState<"order" | "popular" | "clicks">("popular");
 
@@ -61,6 +62,10 @@ export default function Home() {
       result = result.filter((link) => link.category === categoryFilter);
     }
 
+    if (sharerFilter !== "all") {
+      result = result.filter((link) => link.sharer === sharerFilter);
+    }
+
     if (coreOnly) {
       result = result.filter((link) => link.isCore);
     }
@@ -86,7 +91,7 @@ export default function Home() {
     });
 
     return result;
-  }, [lesson, searchQuery, categoryFilter, coreOnly, sortBy, stats]);
+  }, [lesson, searchQuery, categoryFilter, sharerFilter, coreOnly, sortBy, stats]);
 
   const topPopularLinks = useMemo(() => {
     if (!lesson) return [];
@@ -132,6 +137,7 @@ export default function Home() {
               setSelectedLessonId(l.lessonId);
               setSearchQuery("");
               setCategoryFilter("all");
+              setSharerFilter("all");
             }}
           >
             第{l.lessonId}回
@@ -185,6 +191,20 @@ export default function Home() {
                   <option value="all">すべて</option>
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.filterGroup}>
+                <span className={styles.filterLabel}>投稿者:</span>
+                <select
+                  className={styles.select}
+                  value={sharerFilter}
+                  onChange={(e) => setSharerFilter(e.target.value)}
+                >
+                  <option value="all">全員</option>
+                  {sharers.map((sharer) => (
+                    <option key={sharer} value={sharer}>{sharer}</option>
                   ))}
                 </select>
               </div>
