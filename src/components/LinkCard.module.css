@@ -154,18 +154,20 @@
 }
 
 .editIconButton {
-  background: none;
-  border: none;
-  color: #94a3b8;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #3b82f6;
   font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
   transition: all 0.2s;
 }
 .editIconButton:hover {
-  background-color: #f1f5f9;
-  color: #3b82f6;
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
 }
 
 .actions {
