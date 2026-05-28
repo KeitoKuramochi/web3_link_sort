@@ -69,11 +69,14 @@ export default function LinkCard({ link, stats, detailOverride, isPopular, onSta
   }, [link.id]);
 
   const handleLinkClick = async () => {
+    // 楽観的UI更新（表示だけ+1）
     if (onStatChange) {
       onStatChange(link.id, { ...stats, clicks: stats.clicks + 1 });
     }
+    // バックグラウンドでSupabaseに書き込み（クールダウン中はスキップ）
+    // クールダウン中は { clicks: 0 } が返るのでUIは上書きしない
     const newStats = await incrementStat(link.id, "click");
-    if (onStatChange) {
+    if (onStatChange && newStats.clicks > 0) {
       onStatChange(link.id, newStats);
     }
   };
