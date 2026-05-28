@@ -73,6 +73,7 @@ export const getLinkStats = async (): Promise<LinkStats> => {
           recommends: row.recommend_count || 0
         };
       });
+
       return stats;
     } catch (error) {
       console.error("Supabaseからのデータ取得に失敗しました", error);
@@ -122,12 +123,8 @@ export const getLinkDetails = async (): Promise<LinkDetails> => {
  * clickの場合はクールダウン（3時間）を確認し、期間内なら書き込みをスキップします。
  * UIへの影響はなく、バックエンドへの書き込みのみ制限されます。
  */
-export const incrementStat = async (linkId: string, type: "click" | "recommend"): Promise<LinkStatData> => {
-  // clickの場合はクールダウンチェック（UIには反映しない、書き込みだけ制限）
-  if (type === "click" && !checkAndSetClickCooldown(linkId)) {
-    // クールダウン中 → 現在のサーバーの値をそのまま返す（UIは呼び出し元で楽観的更新済み）
-    return { clicks: 0, recommends: 0 };
-  }
+export const incrementStat = async (linkId: string, type: "click" | "recommend"): Promise<LinkStatData | null> => {
+
 
   if (isSupabaseConfigured && supabase) {
     try {
