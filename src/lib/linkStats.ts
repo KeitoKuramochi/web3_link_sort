@@ -7,35 +7,6 @@ const isSupabaseConfigured = supabaseUrl !== "" && supabaseKey !== "";
 const supabase = isSupabaseConfigured ? createClient(supabaseUrl, supabaseKey) : null;
 const STORAGE_KEY = "web3ai_link_stats";
 
-// クリック数のクールダウン管理（3時間）
-// UIには影響せず、バックエンドへの書き込みのみ制限する
-const CLICK_COOLDOWN_KEY = "web3ai_click_cooldown";
-const CLICK_COOLDOWN_MS = 3 * 60 * 60 * 1000; // 3時間
-
-function getClickCooldowns(): Record<string, number> {
-  if (typeof window === "undefined") return {};
-  try {
-    const data = localStorage.getItem(CLICK_COOLDOWN_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch {
-    return {};
-  }
-}
-
-/**
- * クリックをバックエンドに書き込んでよいか判定し、OKなら記録する
- */
-function checkAndSetClickCooldown(linkId: string): boolean {
-  const cooldowns = getClickCooldowns();
-  const last = cooldowns[linkId];
-  if (last && Date.now() - last < CLICK_COOLDOWN_MS) {
-    return false; // クールダウン中 → 書き込みしない
-  }
-  cooldowns[linkId] = Date.now();
-  localStorage.setItem(CLICK_COOLDOWN_KEY, JSON.stringify(cooldowns));
-  return true; // クールダウン解除 → 書き込みOK
-}
-
 export type LinkStatData = {
   clicks: number;
   recommends: number;
@@ -124,8 +95,6 @@ export const getLinkDetails = async (): Promise<LinkDetails> => {
  * UIへの影響はなく、バックエンドへの書き込みのみ制限されます。
  */
 export const incrementStat = async (linkId: string, type: "click" | "recommend"): Promise<LinkStatData | null> => {
-
-
   if (isSupabaseConfigured && supabase) {
     try {
       // 1. まず現在の値を取得

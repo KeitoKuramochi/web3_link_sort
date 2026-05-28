@@ -39,6 +39,32 @@ function formatCooldown(ms: number): string {
   return `${minutes}分後に再度押せます`;
 }
 
+const CLICK_COOLDOWN_KEY = "web3ai_click_cooldown";
+const CLICK_COOLDOWN_MS = 3 * 60 * 60 * 1000;
+
+function getClickCooldowns(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const data = localStorage.getItem(CLICK_COOLDOWN_KEY);
+    return data ? JSON.parse(data) : {};
+  } catch {
+    return {};
+  }
+}
+
+function setClickCooldown(linkId: string) {
+  const cooldowns = getClickCooldowns();
+  cooldowns[linkId] = Date.now();
+  localStorage.setItem(CLICK_COOLDOWN_KEY, JSON.stringify(cooldowns));
+}
+
+function getRemainingClickCooldown(linkId: string): number {
+  const cooldowns = getClickCooldowns();
+  const last = cooldowns[linkId];
+  if (!last) return 0;
+  return Math.max(0, CLICK_COOLDOWN_MS - (Date.now() - last));
+}
+
 interface LinkCardProps {
   link: LinkItem;
   stats: LinkStatData;
@@ -54,14 +80,15 @@ export default function LinkCard({ link, stats, detailOverride, isPopular, onSta
   const [editSummary, setEditSummary] = useState(detailOverride?.summary || link.summary);
   const [isSaving, setIsSaving] = useState(false);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const [clickCooldownRemaining, setClickCooldownRemaining] = useState(0);
 
   const displayTitle = detailOverride?.title || link.title;
   const displaySummary = detailOverride?.summary || link.summary;
 
-  // クールダウン残り時間を毎分更新
   useEffect(() => {
     const update = () => {
       setCooldownRemaining(getRemainingCooldown(link.id));
+      setClickCooldownRemaining(getRemainingClickCooldown(link.id));
     };
     update();
     const interval = setInterval(update, 30000);
@@ -69,16 +96,16 @@ export default function LinkCard({ link, stats, detailOverride, isPopular, onSta
   }, [link.id]);
 
   const handleLinkClick = async () => {
-    // 楽観的にクリック数を +1 表示し、バックエンドに書き込み
+    if (clickCooldownRemaining > 0) return;
+    setClickCooldown(link.id);
+    setClickCooldownRemaining(CLICK_COOLDOWN_MS);
     if (onStatChange) {
       onStatChange(link.id, { ...stats, clicks: stats.clicks + 1 });
     }
-    // サーバーに書き込みを試み、返ってきたら UI を上書き
     const newStats = await incrementStat(link.id, "click");
     if (onStatChange && newStats) {
       onStatChange(link.id, newStats);
     }
-    // リンクはそのまま新タブで開く（デフォルトの a タグが動作）
   };
 
 const handleRecommendClick = async () => {
