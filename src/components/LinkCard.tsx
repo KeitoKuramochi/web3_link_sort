@@ -12,10 +12,16 @@ interface LinkCardProps {
 }
 
 export default function LinkCard({ link, clickCount, isPopular, onLinkClick }: LinkCardProps) {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // リンクを開く前にクリック数を加算
-    const newCount = incrementLinkClick(link.id);
+  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // リンクを開く前にクリック数を加算 (楽観的UI更新として先にカウントを上げることも可能ですが、今回はシンプルに処理)
     if (onLinkClick) {
+      // 画面上の数値を即座に増やす（楽観的更新）
+      onLinkClick(link.id, clickCount + 1);
+    }
+    // バックグラウンドで非同期に保存
+    const newCount = await incrementLinkClick(link.id);
+    if (onLinkClick && newCount > clickCount + 1) {
+      // もし他人のクリック等で更に増えていたら再更新
       onLinkClick(link.id, newCount);
     }
   };

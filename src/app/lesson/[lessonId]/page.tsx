@@ -19,7 +19,11 @@ export default function LessonPage({ params }: { params: Promise<{ lessonId: str
   
   // マウント時にクリック数を取得
   useEffect(() => {
-    setClicks(getLinkClicks());
+    const fetchClicks = async () => {
+      const stats = await getLinkClicks();
+      setClicks(stats);
+    };
+    fetchClicks();
   }, []);
 
   if (!lesson) {
