@@ -30,7 +30,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-1",
         order: 1,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "LINE翻訳Botハンズオン",
         url: "https://web3ai-gairon.github.io/pub-docs/hands-on-line-translator/",
         category: "ハンズオン教材",
@@ -43,7 +43,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-2",
         order: 2,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "LINE翻訳Bot教材ソースコード",
         url: "https://github.com/web3ai-gairon/pub-docs/tree/main/hands-on-line-translator",
         category: "GitHub",
@@ -56,7 +56,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-3",
         order: 3,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "Discord AI Bot教材ソースコード",
         url: "https://github.com/web3ai-gairon/pub-docs/tree/main/hands-on-nanoclaw-discord",
         category: "GitHub",
@@ -69,7 +69,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-4",
         order: 4,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "Discord AI Botハンズオン",
         url: "https://web3ai-gairon.github.io/pub-docs/hands-on-nanoclaw-discord/",
         category: "ハンズオン教材",
@@ -82,7 +82,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-5",
         order: 5,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "DB/API連携サンプルソースコード",
         url: "https://github.com/web3ai-gairon/pub-docs/tree/main/hands-on-db-api-sample",
         category: "GitHub",
@@ -96,7 +96,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-6",
         order: 6,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "Webアプリ作成教材 (DB/API連携)",
         url: "https://web3ai-gairon.github.io/pub-docs/hands-on-db-api-sample/index.html",
         category: "ハンズオン教材",
@@ -110,7 +110,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-7",
         order: 7,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "Google AI Studio APIキー取得",
         url: "https://aistudio.google.com/api-keys",
         category: "APIキー",
@@ -123,7 +123,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-8",
         order: 8,
-        sharer: "spark [w3ai]",
+        sharer: "spark",
         title: "AIチャットサンプルアプリ",
         url: "https://minta-sensei-handson.vercel.app/",
         category: "サンプルアプリ",
@@ -136,7 +136,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-9",
         order: 9,
-        sharer: "otiek(ｵﾁｴｸ) [w3ai]",
+        sharer: "otiek(ｵﾁｴｸ)",
         title: "AI API + Supabase 実例アプリ",
         url: "https://ojisan-chimera-lab.vercel.app/",
         category: "サンプルアプリ",
@@ -175,7 +175,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-12",
         order: 12,
-        sharer: "aikido 🥋 [LABS]",
+        sharer: "aikido 🥋",
         title: "Devconnect",
         url: "https://devconnect.org/",
         category: "参考記事",
@@ -201,7 +201,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-14",
         order: 14,
-        sharer: "aikido 🥋 [LABS]",
+        sharer: "aikido 🥋",
         title: "web3/AI概論 コース概要",
         url: "https://www.youtube.com/watch?v=bSC2K7xEMfc",
         category: "動画",
@@ -227,7 +227,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-16",
         order: 16,
-        sharer: "usagi🐰 [GDev]",
+        sharer: "usagi🐰",
         title: "e-Gov法令API MCPツール",
         url: "https://github.com/ryoooo/e-gov-law-mcp",
         category: "法令API",
@@ -240,7 +240,7 @@ export const lessons: Lesson[] = [
       {
         id: "link-6-17",
         order: 17,
-        sharer: "shige [w3ai]",
+        sharer: "shige",
         title: "e-Gov 法令検索API",
         url: "https://laws.e-gov.go.jp/apitop/",
         category: "法令API",
